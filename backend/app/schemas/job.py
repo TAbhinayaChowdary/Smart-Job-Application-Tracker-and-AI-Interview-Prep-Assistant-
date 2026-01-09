@@ -10,6 +10,8 @@ class JobApplicationBase(BaseModel):
     status: Optional[str] = "Applied"
     source: Optional[str] = None
     location: Optional[str] = None
+    interview_date: Optional[datetime] = None
+    deadline_date: Optional[datetime] = None
 
 class JobApplicationCreate(JobApplicationBase):
     job_description: Optional[str] = None

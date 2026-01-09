@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Any
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import base64
@@ -81,23 +81,27 @@ def _is_job_related(subject: str, body: str) -> bool:
     return any(kw in text for kw in JOB_KEYWORDS)
 
 
-def fetch_job_related_emails(max_results: int = 50) -> List[Dict]:
+def fetch_job_related_emails(max_results: int = 50, page_token: str = None) -> Dict[str, Any]:
     """
-    Returns a list of job-related emails with basic info:
-    [{id, snippet, subject, body, threadId, internalDate}, ...]
+    Returns a dict with:
+      - emails: list of job-related emails
+      - next_page_token: string/None
     """
     service = _get_gmail_service()
 
     try:
-        # basic query: exclude promotions / social if you like using category filters
-        # q = 'category:primary'   # optional Gmail search query
-        resp = service.users().messages().list(
-            userId="me",
-            maxResults=max_results,
-            # q=q,  # optional
-        ).execute()
+        kwargs = {
+            'userId': "me",
+            'maxResults': max_results,
+        }
+        if page_token:
+            kwargs['pageToken'] = page_token
+
+        resp = service.users().messages().list(**kwargs).execute()
 
         messages = resp.get("messages", [])
+        next_page = resp.get("nextPageToken")
+        
         results: List[Dict] = []
 
         for m in messages:
@@ -121,12 +125,17 @@ def fetch_job_related_emails(max_results: int = 50) -> List[Dict]:
                         "role_title": extracted.get("role_title"),
                         "company_name": extracted.get("company_name"),
                         "status": extracted.get("status"),
+                        "interview_date": extracted.get("interview_date"),
+                        "deadline_date": extracted.get("deadline_date"),
                         "confidence": extracted.get("confidence"),
                         "link": f"https://mail.google.com/mail/u/0/#inbox/{msg.get('threadId')}"
                     }
                 )
 
-        return results
+        return {
+            "emails": results,
+            "next_page_token": next_page
+        }
 
     except HttpError as e:
         raise RuntimeError(f"Gmail API error: {e}")

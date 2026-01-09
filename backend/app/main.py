@@ -4,7 +4,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from backend.app.core.database import engine, Base
 from backend.app.core.config import settings
-from backend.app.api import jobs, auth, prep, gmail_routes
+from backend.app.api import jobs, auth, prep, gmail_routes, resumes, calendar_routes
 
 Base.metadata.create_all(bind=engine)
 
@@ -30,6 +30,8 @@ app.include_router(jobs.router, prefix="/jobs", tags=["jobs"])
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(prep.router, prefix="/prep", tags=["prep"])
 app.include_router(gmail_routes.router, prefix="/gmail", tags=["gmail"])
+app.include_router(resumes.router, prefix="/resumes", tags=["resumes"])
+app.include_router(calendar_routes.router, prefix="/calendar", tags=["calendar"])
 
 @app.get("/")
 def read_root():

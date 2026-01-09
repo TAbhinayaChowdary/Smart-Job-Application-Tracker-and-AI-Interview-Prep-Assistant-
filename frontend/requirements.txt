@@ -3,3 +3,6 @@ requests
 pandas
 plotly
 python-dotenv
+pypdf
+google-generativeai
+streamlit-calendar

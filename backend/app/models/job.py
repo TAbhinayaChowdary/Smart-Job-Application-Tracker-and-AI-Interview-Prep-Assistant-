@@ -22,6 +22,8 @@ class JobApplication(Base):
     resume_text = Column(Text, nullable=True) # Or file path
     status = Column(String, default=ApplicationStatus.APPLIED)
     application_date = Column(DateTime(timezone=True), server_default=func.now())
+    interview_date = Column(DateTime(timezone=True), nullable=True)
+    deadline_date = Column(DateTime(timezone=True), nullable=True)
     source = Column(String, nullable=True)
     location = Column(String, nullable=True)
     
@@ -40,3 +42,10 @@ class InterviewPrep(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     application = relationship("JobApplication", back_populates="prep_materials")
+
+class IgnoredEmail(Base):
+    __tablename__ = "ignored_emails"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    message_id = Column(String, unique=True, index=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

@@ -4,6 +4,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Smart Job Application Tracker"
     DATABASE_URL: str = "sqlite:///./sjtap.db"
     OPENAI_API_KEY: str = ""
+    GEMINI_API_KEY: str = ""
     SECRET_KEY: str = "supersecretkey"
     
     # Google Auth
